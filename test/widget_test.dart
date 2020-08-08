@@ -66,4 +66,25 @@ void main() {
     expect(() => holder.findUserInFriends("SkiLl DRanch2", user1),
         throwsA(isException));
   });
+
+  test('importUser', () {
+    List<String> test_data = [
+      "Eric Freeman; eric.freeman@gmail.com; +1 (231) 076-1449;",
+      "Eric Freeman1; eric1.freeman@gmail.com; +2 (231) 076-1449;",
+      "Eric Freeman2; eric2.freeman@gmail.com; +3 (231) 076-1449;",
+      "Eric Freeman3; eric3.freeman@gmail.com; +4 (231) 076-1449;",
+      "Eric Freeman4; eric4.freeman@gmail.com; +5 (231) 076-1449;",
+    ];
+
+    List<User> usersList;
+    usersList = holder.importUsers(test_data);
+    User user1 = User(
+        name: "Eric Freeman",
+        email: "eric.freeman@gmail.com",
+        phone: "+1 (231) 076-1449");
+
+    expect(usersList, isList);
+    expect(usersList[0], user1);
+    expect(usersList.length, 5);
+  });
 }
