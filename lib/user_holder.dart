@@ -14,10 +14,11 @@ class UserHolder {
     }
   }
 
-  User registerUser2(String name, String phone, String email,
-      [String type = "email"]) {
-    User user = User(name: name, phone: phone, email: email);
-    if (type == "phone") user.typeLogin = type;
+  User registerUser2(String name, String phone, String email) {
+    String _name = name.trim();
+    String _phone = phone.trim();
+    String _email = email.trim();
+    User user = User(name: _name, phone: _phone, email: _email);
     if (!users.containsKey(user.login)) {
       users[user.login] = user;
       return user;
@@ -27,7 +28,7 @@ class UserHolder {
   }
 
   User registerUserByEmail(String fullName, String email) {
-    User user = this.registerUser2(fullName, '', email);
+    User user = registerUser2(fullName, '', email);
     return user;
   }
 
@@ -36,16 +37,12 @@ class UserHolder {
     return user;
   }
 
-  User findUserInFriends(String fullName, User user) {
-    User _f2User;
+  User findUserInFriends(String login, User user) {
+    User _f2User = users[login];
 
-    _f2User = getUserByFullName(fullName);
-
-    _f2User.friends.forEach((friend) {
-      if (friend == user) {
-        return friend;
-      }
-    });
+    for (final friend in _f2User.friends) {
+      if (friend.name == user.name) return friend;
+    }
     throw Exception("${_f2User.login} is not a friend of the login");
   }
 
@@ -54,7 +51,7 @@ class UserHolder {
 
     users.forEach((user) {
       List data = user.split(";");
-      User u = this.registerUser2(data[0], data[2], data[1]);
+      User u = registerUser2(data[0], data[2], data[1]);
       usersList.add(u);
     });
     return usersList;
@@ -74,7 +71,6 @@ class UserHolder {
   }
 
   void setFriends(String login, List<User> friends) {
-    //User user = getUserByLogin(login);
     users[login].addFriend(friends);
   }
 }
