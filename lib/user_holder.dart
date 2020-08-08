@@ -3,7 +3,6 @@ import 'package:FlutterGalleryApp/string_util.dart';
 
 class UserHolder {
   Map<String, User> users = {};
-  //Map<String, User> usersName = {};
 
   void registerUser(String name, String phone, String email) {
     User user = User(name: name, phone: phone, email: email);
@@ -38,20 +37,16 @@ class UserHolder {
   }
 
   User findUserInFriends(String fullName, User user) {
-    String _fName = fullName.split(" ")[0].capitalize();
-    String _sName = fullName.split(" ")[1].capitalize();
-    String _fullName = _fName + " " + _sName;
-    User _findUser;
-    user.friends.forEach((friend) {
-      if (friend.name == _fullName) {
-        _findUser = friend;
+    User _f2User;
+
+    _f2User = getUserByFullName(fullName);
+
+    _f2User.friends.forEach((friend) {
+      if (friend == user) {
+        return friend;
       }
     });
-    if (_findUser != null) {
-      return _findUser;
-    } else {
-      throw Exception("${user.login} is not a friend of the login");
-    }
+    throw Exception("${_f2User.login} is not a friend of the login");
   }
 
   List<User> importUsers(List<String> users) {
@@ -69,8 +64,17 @@ class UserHolder {
     return users[login];
   }
 
+  User getUserByFullName(String fullName) {
+    users.forEach((login, user) {
+      print(fullName);
+      print(user);
+      if (user.name == fullName) return user;
+    });
+    throw Exception("User not found");
+  }
+
   void setFriends(String login, List<User> friends) {
-    User user = getUserByLogin(login);
-    user.addFriend(friends);
+    //User user = getUserByLogin(login);
+    users[login].addFriend(friends);
   }
 }
