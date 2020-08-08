@@ -1,4 +1,4 @@
-import './modules/user.dart';
+import './models/user.dart';
 import 'package:FlutterGalleryApp/string_utils.dart';
 
 class UserHolder {
@@ -15,9 +15,10 @@ class UserHolder {
     }
   }
 
-  User registerUser2(String name, String phone, String email) {
+  User registerUser2(String name, String phone, String email,
+      [String type = "email"]) {
     User user = User(name: name, phone: phone, email: email);
-
+    if (type == "phone") user.typeLogin = type;
     if (!users.containsKey(user.login)) {
       users[user.login] = user;
       return user;
@@ -27,13 +28,12 @@ class UserHolder {
   }
 
   User registerUserByEmail(String fullName, String email) {
-    User user = this.registerUser2(fullName, '+00000000000', email);
+    User user = this.registerUser2(fullName, '', email);
     return user;
   }
 
   User registerUserByPhone(String fullName, String phone) {
-    User user = this.registerUser2(fullName, phone, 'email');
-
+    User user = registerUser2(fullName, phone, "");
     return user;
   }
 
@@ -54,28 +54,23 @@ class UserHolder {
     }
   }
 
-  /**
-   * *importUsers
-Необходимо реализовать метод importUsers объекта (object UserHolder) для импорта пользователей из списка строк
-+3
-Аргумент принимает список строк где разделителем полей является ";"
- данные перечислены в следующем порядке. Метод должен вернуть коллекцию User.
-
-Пример csv:
-"""
-Eric Freeman;
-eric.freeman@gmail.com;
-+1 (231) 076-1449;
-"""
-   */
-
   List<User> importUsers(List<String> users) {
     List<User> usersList = <User>[];
+
     users.forEach((user) {
       List data = user.split(";");
       User u = this.registerUser2(data[0], data[2], data[1]);
       usersList.add(u);
     });
     return usersList;
+  }
+
+  User getUserByLogin(String login) {
+    return users[login];
+  }
+
+  void setFriends(String login, List<User> friends) {
+    User user = getUserByLogin(login);
+    user.addFriend(friends);
   }
 }

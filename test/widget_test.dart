@@ -1,18 +1,7 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'package:flutter_test/flutter_test.dart'
+    show expect, group, isA, setUp, tearDownAll, test, throwsA;
 
-// import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-//import 'package:unittest/unittest.dart';
-
-// import 'package:skill_branch_flutter/main.dart';
-// import 'package:skill_branch_flutter/user_holder.dart';
-
-import '../lib/modules/user.dart';
+import '../lib/models/user.dart';
 import '../lib/user_holder.dart';
 
 void main() {
@@ -27,64 +16,138 @@ void main() {
   });
 
   test('registerUser', () {
-    holder.registerUser("SkiLl DRanch", "+98988021456", "popkadur@tm.ur");
+    holder.registerUser("Skill Branch", "+79776150445", "kaparray@gmail.com");
 
-    expect("popkadur@tm.ur", holder.users["popkadur@tm.ur"].login);
-    expect("popkadur@tm.ur", holder.users["popkadur@tm.ur"].email);
-    expect("+98988021456", holder.users["popkadur@tm.ur"].phone);
-    expect("Skill Dranch", holder.users["popkadur@tm.ur"].name);
+    expect("kaparray@gmail.com", holder.users["kaparray@gmail.com"].login);
+    expect("+79776150445", holder.users["kaparray@gmail.com"].phone);
+    expect("kaparray@gmail.com", holder.users["kaparray@gmail.com"].email);
+    expect("Skill Branch", holder.users["kaparray@gmail.com"].name);
   });
 
-  test('registerUserByEmail', () {
-    User user1 = holder.registerUserByEmail("SkiLl DRanch", "popkadur@tm.ur");
-    expect("popkadur@tm.ur", user1.login);
-    expect("popkadur@tm.ur", user1.email);
-    expect("+00000000000", user1.phone);
-    expect("Skill Dranch", user1.name);
+  test('getUserByLogin', () {
+    User user = User(
+        name: "Dan Tot", phone: "+15750761449", email: "dan.tot@yandex.ru");
+    holder.users[user.login] = user;
+
+    expect(user.login, holder.getUserByLogin(user.login).login);
+    expect(user.phone, holder.getUserByLogin(user.login).phone);
+    expect(user.name, holder.getUserByLogin(user.login).name);
+    expect(user.email, holder.getUserByLogin(user.login).email);
   });
 
-  test('registerUserByPhone', () {
-    User user1 = holder.registerUserByPhone("SkiLl DRanch", "+798988077777");
-    expect("email@email.ru", user1.login);
-    expect("email@email.ru", user1.email);
-    expect("+798988077777", user1.phone);
-    expect("Skill Dranch", user1.name);
+  group('Test: getUserByLogin()', () {
+    test('registerUserByPhone', () {
+      User user = holder.registerUserByPhone("John Ray", "+9-733 524-0185");
+
+      expect(user.login, holder.getUserByLogin(user.login).login);
+      expect(user.phone, holder.getUserByLogin(user.login).phone);
+      expect(user.name, holder.getUserByLogin(user.login).name);
+      expect(user.email, holder.getUserByLogin(user.login).email);
+    });
+
+    test('registerUserByPhone', () {
+      expect(() => holder.registerUserByPhone("John Ray", "+9-733 524-085"),
+          throwsA(isA<Exception>()));
+    });
   });
 
-  test('checkUserFriendShips', () {
-    User user1 = holder.registerUserByEmail("SkiLl DRanch", "popkadur@tm.ur");
-    User user2 = holder.registerUserByEmail("SkiLl DRanch2", "email2");
-    User user3 = holder.registerUserByEmail("SkiLl DR2", "email3");
+  group('Test: getUserByLogin()', () {
+    test('registerUserByEmail', () {
+      User user = holder.registerUserByEmail("John Ray", "ray1550@yahoo.net");
 
-    user1.addFriend([user2, user3]);
+      expect(user.login, holder.getUserByLogin(user.login).login);
+      expect(user.phone, holder.getUserByLogin(user.login).phone);
+      expect(user.name, holder.getUserByLogin(user.login).name);
+      expect(user.email, holder.getUserByLogin(user.login).email);
+    });
 
-    expect(user1.friends.contains(user2), isTrue);
-    expect(user1.friends.contains(user3), isTrue);
-    user1.removeFriend(user2);
-    expect(false, user1.friends.contains(user2));
-    expect(user3, holder.findUserInFriends("Skill DR2", user1));
-    expect(() => holder.findUserInFriends("SkiLl DRanch2", user1),
-        throwsA(isException));
+    test('Email is not valid registerUserByPhone', () {
+      expect(() => holder.registerUserByEmail("John Ray", "dfdsag"),
+          throwsA(isA<Exception>()));
+    });
+
+    test('Exception(A user with this email already exists) registerUserByEmail',
+        () {
+      holder.registerUserByEmail("John Ray", "ray1550@yahoo.net");
+
+      expect(() => holder.registerUserByEmail("John Ray", "ray1550@yahoo.net"),
+          throwsA(isA<Exception>()));
+    });
   });
 
-  test('importUser', () {
-    List<String> test_data = [
-      "Eric Freeman; eric.freeman@gmail.com; +1 (231) 076-1449;",
-      "Eric Freeman1; eric1.freeman@gmail.com; +2 (231) 076-1449;",
-      "Eric Freeman2; eric2.freeman@gmail.com; +3 (231) 076-1449;",
-      "Eric Freeman3; eric3.freeman@gmail.com; +4 (231) 076-1449;",
-      "Eric Freeman4; eric4.freeman@gmail.com; +5 (231) 076-1449;",
+  test('setFriends', () {
+    User user = User(
+        name: "Dan Tot", phone: "+15750761449", email: "dan.tot@yandex.ru");
+    holder.users[user.login] = user;
+
+    List<User> friends = [
+      User(name: "Ray Dalio", email: "ray.dalio@gmail.com"),
+      User(name: "Warren Buffett", phone: "+1 833-914-92-65"),
     ];
 
-    List<User> usersList;
-    usersList = holder.importUsers(test_data);
-    User user1 = User(
-        name: "Eric Freeman",
-        email: "eric.freeman@gmail.com",
-        phone: "+1 (231) 076-1449");
+    holder.setFriends(user.login, friends);
 
-    expect(usersList, isList);
-    expect(usersList[0], user1);
-    expect(usersList.length, 5);
+    expect(2, holder.users[user.login].friends.length);
+
+    expect(friends[0].email, holder.users[user.login].friends[0].email);
+    expect(friends[0].login, holder.users[user.login].friends[0].login);
+    expect(friends[0].phone, holder.users[user.login].friends[0].phone);
+
+    expect(friends[1].email, holder.users[user.login].friends[1].email);
+    expect(friends[1].login, holder.users[user.login].friends[1].login);
+    expect(friends[1].phone, holder.users[user.login].friends[1].phone);
+  });
+
+  group('findUserInFriends', () {
+    test('findUserInFriends', () {
+      User user = User(
+          name: "Dan Tot", phone: "+15750761449", email: "dan.tot@yandex.ru");
+      holder.users[user.login] = user;
+
+      List<User> friends = [
+        User(name: "Ray Dalio", email: "ray.dalio@gmail.com"),
+        User(name: "Warren Buffett", phone: "+1 833-914-92-65"),
+      ];
+
+      holder.setFriends(user.login, friends);
+
+      expect(friends[0], holder.findUserInFriends(user.login, friends[0]));
+      expect(friends[1], holder.findUserInFriends(user.login, friends[1]));
+    });
+
+    test('findUserInFriends exception', () {
+      User user = User(
+          name: "Dan Tot", phone: "+15750761449", email: "dan.tot@yandex.ru");
+      holder.users[user.login] = user;
+
+      List<User> friends = [
+        User(name: "Ray Dalio", email: "ray.dalio@gmail.com"),
+        User(name: "Warren Buffett", phone: "+1 833-914-92-65"),
+      ];
+
+      expect(() => holder.findUserInFriends(user.login, friends[0]),
+          throwsA(isA<Exception>()));
+      expect(() => holder.findUserInFriends(user.login, friends[1]),
+          throwsA(isA<Exception>()));
+    });
+  });
+
+  test('Test: UserHolder.importUsers()', () {
+    User user = User(
+        name: "Dan Tot",
+        phone: "+1 (231) 076-1449",
+        email: "dan.tot@yandex.ru");
+
+    List<User> users = holder.importUsers([
+      """
+      ${user.name};
+      ${user.email};
+      ${user.phone};
+      """,
+    ]);
+
+    expect(users[0].login, user.login);
+    expect(users[0].email, user.email);
+    expect(users[0].phone, user.phone);
   });
 }

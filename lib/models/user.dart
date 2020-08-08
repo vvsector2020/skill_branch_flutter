@@ -22,8 +22,10 @@ class User {
 
   factory User({String name, String phone, String email}) {
     if (name.isEmpty) throw Exception("User name is empty");
-    if (phone.isEmpty || email.isEmpty)
-      throw Exception("phone or email is empty");
+    if (phone == null) phone = "";
+    if (email == null) email = "";
+    if (phone.isEmpty && email.isEmpty)
+      throw Exception("phone and email is empty");
 
     return User._(
       firstName: _getFirstName(name),
@@ -35,13 +37,16 @@ class User {
 
   static String _getLastName(String userName) =>
       userName.split(" ")[1].capitalize();
+
   static String _getFirstName(String userName) =>
       userName.split(" ")[0].capitalize();
+
   static String checkPhone(String phone) {
+    if (phone.isEmpty) return phone;
     String pattern = r"^(?:[+0])?[0-9]{11}";
     phone = phone.replaceAll(RegExp("[^+\\d]"), "");
 
-    if (phone == null || phone.isEmpty) {
+    if (phone == null) {
       throw Exception("Enter don't empty phone number");
     } else if (!RegExp(pattern).hasMatch(phone)) {
       throw Exception(
@@ -52,14 +57,14 @@ class User {
   }
 
   static String checkEmail(String email) {
-    //String pattern = r"^[a-z]@?[a-z].[a-z]";
+    if (email.isEmpty) return email;
+    String pattern = r"^[a-zA-Z0-9.]+\@[a-zA-Z0-9]+\.[a-zA-Z0-9]+";
 
-    if (email == null || email.isEmpty) {
+    if (email == null) {
       throw Exception("Enter don't empty email");
+    } else if (!RegExp(pattern).hasMatch(email)) {
+      throw Exception("Enter a valid email");
     }
-    //else if (!RegExp(pattern).hasMatch(email)) {
-    //  throw Exception("Enter a valid email");
-    //}
 
     return email;
   }
@@ -69,6 +74,14 @@ class User {
       return phone;
     } else {
       return email;
+    }
+  }
+
+  set typeLogin(String type) {
+    if (type == "phone") {
+      _type = LoginType.phone;
+    } else {
+      _type = LoginType.email;
     }
   }
 
