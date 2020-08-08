@@ -1,5 +1,5 @@
 import './models/user.dart';
-import 'package:FlutterGalleryApp/string_utils.dart';
+import 'package:FlutterGalleryApp/string_util.dart';
 
 class UserHolder {
   Map<String, User> users = {};
